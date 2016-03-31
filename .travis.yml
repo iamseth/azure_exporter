@@ -1,0 +1,13 @@
+sudo: false
+language: go
+go:
+  - 1.6
+  - 1.5.3
+  - tip
+
+env:
+  - GO15VENDOREXPERIMENT=1
+
+script:
+  - make
+  - make test
