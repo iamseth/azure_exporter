@@ -76,11 +76,12 @@ func (e *Exporter) scrapeVPNConnections() error {
 	var wg sync.WaitGroup
 	for _, conn := range conns {
 		wg.Add(1)
-		defer wg.Done()
 		go func(conn azure.VPNConnection) {
+			defer wg.Done()
 			connection, err := e.azureClient.FindVPNConnection(conn.ResourceGroup, conn.Name)
 			if err != nil {
 				log.Errorf("Unable to retrieve VPN connection %s from Azure: %s", conn.Name, err)
+				return
 			}
 			name := strings.ToLower(conn.Name)
 			rgroup := strings.ToLower(conn.ResourceGroup)
@@ -93,6 +94,7 @@ func (e *Exporter) scrapeVPNConnections() error {
 			}
 		}(conn)
 	}
+	wg.Wait()
 	return nil
 }
 
